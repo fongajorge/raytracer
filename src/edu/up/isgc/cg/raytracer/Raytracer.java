@@ -33,26 +33,27 @@ public class Raytracer {
 
         Scene scene02 = new Scene();
         scene02.setCamera(new Camera(new Vector3D(0, 0, -4), 60, 60, 800, 800, 0.6, 50.0));
-        //scene02.addLight(new PointLight(new Vector3D(0.0, 1.0, 0.0),Color.WHITE, 0.8));
-        scene02.addLight(new SpotLight(
-                new Vector3D(0, 1.0, 0),          // Position (above the scene)
-                new Vector3D(0, -1, 0.2),        // Direction (slightly angled forward)
-                Color.WHITE,                     // Light color
-                1.5,                             // Intensity
-                Math.toRadians(60),              // 30-degree cutoff angle (converted to radians)
-                15                               // Falloff exponent
+        scene02.addLight(new PointLight(new Vector3D(0.0, 1.0, 0.0),Color.WHITE, 5));
+        //scene02.addLight(new PointLight(new Vector3D(0.0, 0.0, 0.0),Color.WHITE, 0.8));
+        /*scene02.addLight(new SpotLight(
+                new Vector3D(0, 1.0, 0),
+                new Vector3D(0, -1, 0.2),
+                Color.WHITE,
+                10,
+                Math.toRadians(160),
+                15
         ));
         /*scene02.addLight(new DirectionalLight(new Vector3D(0.0, 0.0, 1.0), Color.WHITE, 0.8));
         scene02.addLight(new DirectionalLight(new Vector3D(0.0, -0.1, 0.1), Color.WHITE, 0.2));
         scene02.addLight(new DirectionalLight(new Vector3D(-0.2, -0.1, 0.0), Color.WHITE, 0.2));*/
-        scene02.addObject(new Sphere(new Vector3D(0.0, 1.0, 5.0), 0.5, Color.RED));
-        scene02.addObject(new Sphere(new Vector3D(0.5, 1.0, 4.5), 0.25, new Color(200, 255, 0)));
-        scene02.addObject(new Sphere(new Vector3D(0.35, 1.0, 4.5), 0.3, Color.BLUE));
-        scene02.addObject(new Sphere(new Vector3D(4.85, 1.0, 4.5), 0.3, Color.PINK));
+        scene02.addObject(new Sphere(new Vector3D(0.0, 1.0, 5.0), 0.5, Color.RED, 0.7));
+        scene02.addObject(new Sphere(new Vector3D(0.5, 1.0, 4.5), 0.25, new Color(200, 255, 0), 0.8));
+        scene02.addObject(new Sphere(new Vector3D(0.35, 1.0, 4.5), 0.3, Color.BLUE, 0.6));
+        scene02.addObject(new Sphere(new Vector3D(4.85, 1.0, 4.5), 0.3, Color.PINK, 0.22));
         scene02.addObject(new Sphere(new Vector3D(2.85, 1.0, 304.5), 0.5, Color.BLUE));
-        scene02.addObject(OBJReader.getModel3D("Cube.obj", new Vector3D(0f, -2.5, 1.0), Color.WHITE));
-        scene02.addObject(OBJReader.getModel3D("CubeQuad.obj", new Vector3D(-3.0, -2.5, 3.0), Color.GREEN));
-        scene02.addObject(OBJReader.getModel3D("SmallTeapot.obj", new Vector3D(2.0, -1.0, 1.5), Color.BLUE));
+        scene02.addObject(OBJReader.getModel3D("Cube.obj", new Vector3D(0f, -2.5, 5), Color.WHITE));
+        scene02.addObject(OBJReader.getModel3D("CubeQuad.obj", new Vector3D(-3.0, -2.5, 3.0), Color.GREEN, 0.4));
+        scene02.addObject(OBJReader.getModel3D("SmallTeapot.obj", new Vector3D(2.0, -1.0, 1.5), Color.BLUE, 0.6));
         scene02.addObject(OBJReader.getModel3D("Ring.obj", new Vector3D(2.0, -1.0, 1.5), Color.BLUE));
 
         BufferedImage image = raytrace(scene02);
@@ -82,36 +83,88 @@ public class Raytracer {
                 double z = posRaytrace[i][j].getZ() + pos.getZ();
 
                 Ray ray = new Ray(mainCamera.getPosition(), new Vector3D(x, y, z));
-                Intersection closestIntersection = raycast(ray, objects, null,
-                        new double[]{cameraZ + nearFarPlanes[0], cameraZ + nearFarPlanes[1]});
-
-                Color pixelColor = Color.BLACK;
-                if (closestIntersection != null) {
-                    Color objColor = closestIntersection.getObject().getColor();
-
-                    for (Light light : lights) {
-                        double nDotL = light.getNDotL(closestIntersection);
-                        Color lightColor = light.getColor();
-                        double intensity = light.getIntensity() * nDotL;
-
-                        double[] lightColors = new double[]{lightColor.getRed() / 255.0, lightColor.getGreen() / 255.0, lightColor.getBlue() / 255.0};
-                        double[] objColors = new double[]{objColor.getRed() / 255.0, objColor.getGreen() / 255.0, objColor.getBlue() / 255.0};
-                        for (int colorIndex = 0; colorIndex < objColors.length; colorIndex++) {
-                            objColors[colorIndex] *= intensity * lightColors[colorIndex];
-                        }
-
-                        Color diffuse = new Color((float) Math.clamp(objColors[0], 0.0, 1.0),
-                                (float) Math.clamp(objColors[1], 0.0, 1.0),
-                                (float) Math.clamp(objColors[2], 0.0, 1.0));
-
-                        pixelColor = addColor(pixelColor, diffuse);
-                    }
-                }
+                Color pixelColor = traceRay(ray, objects, lights, new double[]{cameraZ + nearFarPlanes[0], cameraZ + nearFarPlanes[1]}, 0, null);
                 image.setRGB(i, j, pixelColor.getRGB());
             }
         }
 
         return image;
+    }
+
+    private static Color traceRay(Ray ray, List<Object3D> objects, List<Light> lights, double[] clippingPlanes, int depth, Object3D caster) {
+        final int MAX_REFLECTIONS = 5;
+        if (depth > MAX_REFLECTIONS) {
+            return Color.BLACK;
+        }
+
+        Intersection closestIntersection = raycast(ray, objects, caster, clippingPlanes);
+        if (closestIntersection == null) {
+            return Color.BLACK;
+        }
+
+        Color objColor = closestIntersection.getObject().getColor();
+        Color diffuseColor = Color.BLACK;
+
+        for (Light light : lights) {
+            double nDotL = light.getNDotL(closestIntersection);
+            Color lightColor = light.getColor();
+            double intensity = light.getIntensity() * nDotL;
+
+            double[] lightColors = new double[]{
+                    lightColor.getRed() / 255.0,
+                    lightColor.getGreen() / 255.0,
+                    lightColor.getBlue() / 255.0
+            };
+            double[] objColors = new double[]{
+                    objColor.getRed() / 255.0,
+                    objColor.getGreen() / 255.0,
+                    objColor.getBlue() / 255.0
+            };
+
+            for (int colorIndex = 0; colorIndex < objColors.length; colorIndex++) {
+                objColors[colorIndex] *= intensity * lightColors[colorIndex];
+            }
+
+            Color diffuse = new Color(
+                    (float) Math.clamp(objColors[0], 0.0, 1.0),
+                    (float) Math.clamp(objColors[1], 0.0, 1.0),
+                    (float) Math.clamp(objColors[2], 0.0, 1.0)
+            );
+
+            diffuseColor = addColor(diffuseColor, diffuse);
+        }
+
+        double reflectivity = closestIntersection.getObject().getReflectivity();
+        Color reflectedColor = Color.BLACK;
+
+        if (reflectivity > 0) {
+            Vector3D N = closestIntersection.getNormal();
+            Vector3D I = ray.getDirection();
+            double dot = Vector3D.dotProduct(I, N);
+            Vector3D R = Vector3D.substract(I, Vector3D.scalarMultiplication(N, 2 * dot));
+            R = Vector3D.normalize(R);
+
+            // Offset origin to prevent self-intersection
+            Vector3D offsetOrigin = Vector3D.add(closestIntersection.getPosition(), Vector3D.scalarMultiplication(N, 1e-4));
+            Ray reflectedRay = new Ray(offsetOrigin, R);
+
+            reflectedColor = traceRay(reflectedRay, objects, lights, null, depth + 1, closestIntersection.getObject());
+        }
+
+        Color diffusePart = multiplyColor(diffuseColor, (1 - reflectivity));
+        Color reflectedPart = multiplyColor(reflectedColor, reflectivity);
+
+        return addColor(diffusePart, reflectedPart);
+    }
+
+    public static Color multiplyColor(Color color, double factor) {
+        float red = (float) (color.getRed() / 255.0 * factor);
+        float green = (float) (color.getGreen() / 255.0 * factor);
+        float blue = (float) (color.getBlue() / 255.0 * factor);
+        red = (float) Math.clamp(red, 0.0, 1.0);
+        green = (float) Math.clamp(green, 0.0, 1.0);
+        blue = (float) Math.clamp(blue, 0.0, 1.0);
+        return new Color(red, green, blue);
     }
 
     public static Color addColor(Color original, Color otherColor) {

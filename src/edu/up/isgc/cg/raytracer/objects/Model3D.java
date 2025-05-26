@@ -18,6 +18,11 @@ public class Model3D extends Object3D{
         setTriangles(triangles);
     }
 
+    public Model3D(Vector3D position, Triangle[] triangles, Color color, double reflectivity) {
+        super(position, color, reflectivity);
+        setTriangles(triangles);
+    }
+
     public List<Triangle> getTriangles() {
         return triangles;
     }
