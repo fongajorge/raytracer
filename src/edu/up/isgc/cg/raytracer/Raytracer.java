@@ -91,8 +91,8 @@ public class Raytracer {
         // 3D Objects
         Model3D teapot = OBJReader.getModel3D(
                 "cube.obj",
-                new Vector3D(0, 0, 30),
-                redPlasticMaterial
+                new Vector3D(0, 0, 5),
+                glassMaterial
         );
 
         Sphere sphere = new Sphere(
@@ -112,8 +112,8 @@ public class Raytracer {
         scene_1.addLight(pointLight);
 
         scene_1.addObject(teapot);
-        //scene_1.addObject(sphere);
-        //scene_1.addObject(sphere2);
+        scene_1.addObject(sphere);
+        scene_1.addObject(sphere2);
 
         // ---- Render ---
         BufferedImage image = raytrace(scene_1);
@@ -335,5 +335,10 @@ public class Raytracer {
         }
 
         return closestIntersection;
+    }
+
+    public static double calculateFOVv(double fovH, int w, int h) {
+        double ar = (double) w / h;
+        return 2.0 * Math.toDegrees(Math.atan(Math.tan(Math.toRadians(fovH / 2.0)) / ar));
     }
 }
