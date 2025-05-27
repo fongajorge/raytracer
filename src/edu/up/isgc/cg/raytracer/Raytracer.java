@@ -91,8 +91,8 @@ public class Raytracer {
         // 3D Objects
         Model3D teapot = OBJReader.getModel3D(
                 "cube.obj",
-                new Vector3D(0, 0, 5),
-                glassMaterial
+                new Vector3D(0, 0, 30),
+                redPlasticMaterial
         );
 
         Sphere sphere = new Sphere(
@@ -105,11 +105,19 @@ public class Raytracer {
                 1, silverMetallicMaterial
         );
 
+        Plane plane = new Plane(
+                new Vector3D(0, -1, 0), // Any point on plane
+                new Vector3D(0, 1, 0),  // Upward normal
+                floorMaterial
+        );
+
         // Scene setup
         scene_1.setCamera(camera);
 
         scene_1.addLight(mainLight);
         scene_1.addLight(pointLight);
+
+        scene_1.addObject(plane);
 
         scene_1.addObject(teapot);
         scene_1.addObject(sphere);
