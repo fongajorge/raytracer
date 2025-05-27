@@ -1,23 +1,47 @@
-/**
- * [1968] - [2022] Centros Culturales de Mexico A.C / Universidad Panamericana
- * All Rights Reserved.
- */
 package edu.up.isgc.cg.raytracer.tools;
 
-
 import edu.up.isgc.cg.raytracer.Vector3D;
-import edu.up.isgc.cg.raytracer.objects.Triangle;
+import edu.up.isgc.cg.raytracer.objects.*;
 
 /**
+ * Utility class for calculating barycentric coordinates of a point with respect to a triangle in 3D space.
+ * <p>
+ * This implementation is based on Christer Ericson's algorithm from
+ * <a href="https://www.amazon.com/Real-Time-Collision-Detection-Interactive-Technology/dp/1558607323">Real-Time Collision Detection</a>.
+ * </p>
+ * <p>
+ * Barycentric coordinates represent the point as a weighted average of the triangle's vertices.
+ * They are often used in computer graphics for interpolation, hit testing, and collision detection.
+ * </p>
+ * <p>
+ * This class is not meant to be instantiated; all methods are static.
+ * </p>
+ *
  * @author Jafet Rodríguez
- * @see <a href="https://www.amazon.com/Real-Time-Collision-Detection-Interactive-Technology/dp/1558607323">Christer Ericson's Real-Time Collision Detection</a>
  */
 public class Barycentric {
 
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
     private Barycentric() {
     }
 
-    // Based on Christer Ericson's Real-Time Collision Detection
+    /**
+     * Calculates the barycentric coordinates (u, v, w) of a given point relative to a triangle.
+     *
+     * <p>The barycentric coordinates satisfy the relation:</p>
+     * <pre>
+     * point = u * vertexA + v * vertexB + w * vertexC
+     * </pre>
+     * <p>where u + v + w = 1.</p>
+     *
+     * @param point the 3D point for which barycentric coordinates are computed
+     * @param triangle the triangle defined by three vertices
+     * @return an array of doubles representing the barycentric coordinates {u, v, w}
+     *
+     * @throws IllegalArgumentException if the triangle's vertices are collinear (denominator equals zero)
+     */
     public static double[] CalculateBarycentricCoordinates(Vector3D point, Triangle triangle) {
         double u, v, w;
         Vector3D[] vertices = triangle.getVertices();
@@ -34,11 +58,15 @@ public class Barycentric {
         double d20 = Vector3D.dotProduct(v2, v0);
         double d21 = Vector3D.dotProduct(v2, v1);
         double denominator = d00 * d11 - d01 * d01;
+
+        if (denominator == 0) {
+            throw new IllegalArgumentException("Triangle vertices are collinear or too close to each other.");
+        }
+
         v = (d11 * d20 - d01 * d21) / denominator;
         w = (d00 * d21 - d01 * d20) / denominator;
         u = 1.0 - v - w;
 
         return new double[]{u, v, w};
     }
-
 }
