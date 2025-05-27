@@ -17,15 +17,112 @@ public class Raytracer {
     public static void main(String[] args) {
         System.out.println(new Date());
 
+        // ---- Materials ----
+        Material redPlasticMaterial = new Material(
+                new Color(220, 40, 40),
+                0.1,
+                0.7,
+                0.4,
+                32.0,
+                1.0,
+                0.0,
+                0.0
+        );
 
+        Material glassMaterial = new Material(
+                new Color(180, 216, 245),
+                0.17,
+                0.12,
+                0.95,
+                200.0,
+                1.52,
+                0.28,
+                0.85
+        );
 
-//        BufferedImage image = raytrace(scene02);
-//        File outputImage = new File("image.png");
-//        try {
-//            ImageIO.write(image, "png", outputImage);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+        Material silverMetallicMaterial = new Material(
+                new Color(192, 192, 192),
+                0.03,
+                0.10,
+                1.0,
+                200.0,
+                1.0,
+                0.3,
+                0.0
+        );
+
+        Material floorMaterial = new Material(
+                new Color(240, 240, 240),
+                0.2,
+                0.8,
+                0.1,
+                32.0,
+                1.0,
+                0.0, 0.0 // normal diffuse
+        );
+
+        // ---- Scene 1 ----
+        Scene scene_1 = new Scene();
+
+        // Camera
+        Camera camera = new Camera(
+                new Vector3D(0, 0, 0),
+                60.0,
+                calculateFOVv(60.0, 4096, 2160),
+                4096,
+                2160,
+                1.0,
+                100.0
+        );
+
+        // Lights
+        DirectionalLight mainLight = new DirectionalLight(
+                new Vector3D(0, 0, 1),
+                Color.WHITE,
+                1
+        );
+
+        PointLight pointLight = new PointLight(
+                new Vector3D(0, 2, 15),
+                new Color(0, 216, 245),
+                1
+        );
+
+        // 3D Objects
+        Model3D teapot = OBJReader.getModel3D(
+                "cube.obj",
+                new Vector3D(0, 0, 30),
+                redPlasticMaterial
+        );
+
+        Sphere sphere = new Sphere(
+                new Vector3D(0, 0.1, 15),
+                1, redPlasticMaterial
+        );
+
+        Sphere sphere2 = new Sphere(
+                new Vector3D(3, 0.1, 15),
+                1, silverMetallicMaterial
+        );
+
+        // Scene setup
+        scene_1.setCamera(camera);
+
+        scene_1.addLight(mainLight);
+        scene_1.addLight(pointLight);
+
+        scene_1.addObject(teapot);
+        //scene_1.addObject(sphere);
+        //scene_1.addObject(sphere2);
+
+        // ---- Render ---
+        BufferedImage image = raytrace(scene_1);
+        File outputImage = new File("image.png");
+        try {
+            ImageIO.write(image, "png", outputImage);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println(new Date());
     }
 
