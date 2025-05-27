@@ -68,9 +68,9 @@ public class Raytracer {
         Camera camera = new Camera(
                 new Vector3D(0, 0, 0),
                 60.0,
-                calculateFOVv(60.0, 4096, 2160),
-                4096,
-                2160,
+                calculateFOVv(60.0, 950, 500),
+                475,
+                250,
                 1.0,
                 100.0
         );
@@ -90,8 +90,8 @@ public class Raytracer {
 
         // 3D Objects
         Model3D teapot = OBJReader.getModel3D(
-                "cube.obj",
-                new Vector3D(0, 0, 30),
+                "SmallTeapot.obj",
+                new Vector3D(0, 0, 3),
                 redPlasticMaterial
         );
 
