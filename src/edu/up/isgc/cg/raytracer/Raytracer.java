@@ -58,7 +58,8 @@ public class Raytracer {
                 0.1,
                 32.0,
                 1.0,
-                0.0, 0.0 // normal diffuse
+                0.0,
+                0.0
         );
 
         // ---- Scene 1 ----
@@ -88,6 +89,15 @@ public class Raytracer {
                 1
         );
 
+        AreaLight areaLight = new AreaLight(
+                new Vector3D(0, 10, 0),
+                new Vector3D(40, 0, 0),
+                new Vector3D(0, 0, 20),
+                Color.WHITE,
+                1.0,
+                16
+        );
+
         // 3D Objects
         Model3D teapot = OBJReader.getModel3D(
                 "SmallTeapot.obj",
@@ -114,14 +124,14 @@ public class Raytracer {
         // Scene setup
         scene_1.setCamera(camera);
 
-        scene_1.addLight(mainLight);
-        scene_1.addLight(pointLight);
+        //scene_1.addLight(mainLight);
+        //scene_1.addLight(pointLight);
 
-        scene_1.addObject(plane);
+        //scene_1.addObject(plane);
 
-        scene_1.addObject(teapot);
+        //scene_1.addObject(teapot);
         scene_1.addObject(sphere);
-        scene_1.addObject(sphere2);
+        //scene_1.addObject(sphere2);
 
         // ---- Render ---
         BufferedImage image = raytrace(scene_1);
@@ -243,7 +253,7 @@ public class Raytracer {
 
         // ---- Refraction ----
         double transparency = material.getTransparency();
-        double refractiveIndex = material.getRefractiveIndex(); // e.g. 1.5 for glass
+        double refractiveIndex = material.getRefractiveIndex();
         Color refractedColor = Color.BLACK;
 
         if (transparency > 0) {
@@ -259,7 +269,7 @@ public class Raytracer {
             } else {
                 n1 = refractiveIndex;
                 n2 = 1.0; // leaving material
-                N = Vector3D.scalarMultiplication(normal, -1); // flip normal
+                N = Vector3D.scalarMultiplication(normal, -1);
             }
 
             double cosI = -Vector3D.dotProduct(N, V);
