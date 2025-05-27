@@ -136,7 +136,7 @@ public class Raytracer {
             reflectedColor = traceRay(reflectedRay, objects, lights, null, depth + 1, closestIntersection.getObject());
         }
 
-        // ===== Refraction =====
+        // ---- Refraction ----
         double transparency = material.getTransparency();
         double refractiveIndex = material.getRefractiveIndex(); // e.g. 1.5 for glass
         Color refractedColor = Color.BLACK;
