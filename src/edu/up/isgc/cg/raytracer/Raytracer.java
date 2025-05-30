@@ -228,7 +228,7 @@ public class Raytracer {
 
         // ---- Scene setup ----
         // Scene 1
-        scene_1.setCamera(cameraLowRes);
+        scene_1.setCamera(camera4k);
 
 //        scene_1.addLight(mainLight);
 //        scene_1.addLight(pointLight);
@@ -248,7 +248,7 @@ public class Raytracer {
 
         // ---- Render ---
         BufferedImage image = raytrace(scene_1);
-        File outputImage = new File("Render1.png");
+        File outputImage = new File("Render_1");
         try {
             ImageIO.write(image, "png", outputImage);
         } catch (IOException e) {
@@ -268,7 +268,7 @@ public class Raytracer {
         double cameraZ = pos.getZ();
 
         // Depth of field parameters
-        final int DOF_SAMPLES = 5;
+        final int DOF_SAMPLES = 8;
         final double APERTURE_SIZE = 0.09;
         final double FOCUS_DISTANCE = 10.0;
         final int height = posRaytrace.length;
