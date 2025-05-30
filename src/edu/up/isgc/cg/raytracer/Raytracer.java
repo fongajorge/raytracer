@@ -152,7 +152,7 @@ public class Raytracer {
                 PointLight pointLight_2 = new PointLight(new Vector3D(-3, 30, 20), Color.MAGENTA, 1);
                 PointLight pointLight_3 = new PointLight(new Vector3D(-0, 30, 15), Color.MAGENTA, 1);
                 PointLight pointLight_4 = new PointLight(new Vector3D(3, 30, 20), Color.GREEN, 1);
-                PointLight pointLight_5 = new PointLight(new Vector3D(0, 30, 25), Color.GREEN, 1);
+                PointLight pointLight_5 = new PointLight(new Vector3D(0, 20, 20), Color.GREEN, 1);
 
 
                     // ---- Objects ----
