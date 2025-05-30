@@ -220,7 +220,7 @@ public class Raytracer {
 
         Model3D ring_3 = OBJReader.getModel3D(
                 "ring.obj",
-                new Vector3D(0, 1.5, 1.15),
+                new Vector3D(0, 1.5, 1.3),
                 new Vector3D(0.5, 0.5, 0.5),
                 new Vector3D(90, 0, 0),
                 silverMetallicMaterial
@@ -228,7 +228,7 @@ public class Raytracer {
 
         // ---- Scene setup ----
         // Scene 1
-        scene_1.setCamera(camera4k);
+        scene_1.setCamera(cameraLowRes);
 
 //        scene_1.addLight(mainLight);
 //        scene_1.addLight(pointLight);
@@ -248,7 +248,7 @@ public class Raytracer {
 
         // ---- Render ---
         BufferedImage image = raytrace(scene_1);
-        File outputImage = new File("Render_1");
+        File outputImage = new File("Render_1_2-Bounces_5-DoF.png");
         try {
             ImageIO.write(image, "png", outputImage);
         } catch (IOException e) {
@@ -268,8 +268,10 @@ public class Raytracer {
         double cameraZ = pos.getZ();
 
         // Depth of field parameters
-        final int DOF_SAMPLES = 8;
-        final double APERTURE_SIZE = 0.09;
+        final int DOF_SAMPLES = 1;
+//        final double APERTURE_SIZE = 0.09;
+        final double APERTURE_SIZE = 0.00;
+
         final double FOCUS_DISTANCE = 10.0;
         final int height = posRaytrace.length;
         final int width = posRaytrace[0].length;
@@ -347,7 +349,7 @@ public class Raytracer {
 
 
     private static Color traceRay(Ray ray, List<Object3D> objects, List<Light> lights, double[] clippingPlanes, int depth, Object3D caster) {
-        final int MAX_REFLECTIONS = 2;
+        final int MAX_REFLECTIONS = 6;
         if (depth > MAX_REFLECTIONS) return Color.BLACK;
         Intersection closestIntersection = raycast(ray, objects, caster, clippingPlanes);
         if (closestIntersection == null) return Color.BLACK;
