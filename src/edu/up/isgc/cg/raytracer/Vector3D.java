@@ -166,4 +166,36 @@ public class Vector3D {
     public static Vector3D scalarMultiplication(Vector3D vectorA, double scalar){
         return new Vector3D(vectorA.getX() * scalar, vectorA.getY() * scalar, vectorA.getZ() * scalar);
     }
+
+    public static Vector3D rotateVector(Vector3D v, Vector3D radRotation) {
+        Vector3D rotation = degreesToRadians(radRotation);
+
+        // X axis
+        double cosX = Math.cos(rotation.getX());
+        double sinX = Math.sin(rotation.getX());
+        double y1 = v.getY() * cosX - v.getZ() * sinX;
+        double z1 = v.getY() * sinX + v.getZ() * cosX;
+
+        // Y axis
+        double cosY = Math.cos(rotation.getY());
+        double sinY = Math.sin(rotation.getY());
+        double x2 = v.getX() * cosY + z1 * sinY;
+        double z2 = -v.getX() * sinY + z1 * cosY;
+
+        // Z axis
+        double cosZ = Math.cos(rotation.getZ());
+        double sinZ = Math.sin(rotation.getZ());
+        double x3 = x2 * cosZ - y1 * sinZ;
+        double y3 = x2 * sinZ + y1 * cosZ;
+
+        return new Vector3D(x3, y3, z2);
+    }
+
+    public static Vector3D degreesToRadians(Vector3D degrees){
+        return new Vector3D(
+                Math.toRadians(degrees.getX()),
+                Math.toRadians(degrees.getY()),
+                Math.toRadians(degrees.getZ())
+        );
+    }
 }
