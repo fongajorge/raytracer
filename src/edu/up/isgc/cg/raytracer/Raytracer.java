@@ -21,234 +21,128 @@ public class Raytracer {
     public static void main(String[] args) {
         System.out.println(new Date());
 
-        // ---- Materials ----
-        Material redPlasticMaterial = new Material(
-                new Color(220, 40, 40),
-                0.1,
-                0.7,
-                0.4,
-                32.0,
-                1.0,
-                0.0,
-                0.0
-        );
+        // ---- Cameras ----
+        Camera camera4k = new Camera(new Vector3D(0, 5, 0), 60.0, calculateFOVv(60.0, 1900, 1000), 4096, 2160, 1.0, 100.0);
+        Camera cameraHD = new Camera(new Vector3D(0, 5, 0), 60.0, calculateFOVv(60.0, 1900, 1000), 1900, 1000, 1.0, 100.0);
+        Camera cameraLowRes = new Camera(new Vector3D(0, 5, 0), 60.0, calculateFOVv(60.0, 475, 250), 475, 250, 1.0, 100.0);
+        Camera cameraUltralowRes = new Camera(new Vector3D(0, 5, 0), 60.0, calculateFOVv(60.0, 475, 250), 190, 100, 1.0, 100.0);
 
-        Material glassMaterial = new Material(
-                new Color(180, 216, 245),
-                0.17,
-                0.12,
-                0.95,
-                200.0,
-                1.52,
-                0.28,
-                0.85
-        );
+        /*Scene scene_01 = new Scene() {{
+            // ---- Materials ----
+            Material redPlasticMaterial = new Material(new Color(220, 40, 40), 0.1, 0.7, 0.4, 32.0, 1.0, 0.0, 0.0);
+            Material glassMaterial = new Material(new Color(180, 216, 245), 0.17, 0.12, 0.95, 200.0, 1.52, 0.28, 0.85);
+            Material silverMetallicMaterial = new Material(new Color(192, 192, 192), 0.03, 0.10, 1.0, 200.0, 1.0, 0.3, 0.0);
+            Material floorMaterial = new Material(new Color(240, 240, 240), 0.2, 0.8, 0.1, 32.0, 1.0, 0.0, 0.0);
+            Material floorMaterialGray = new Material(Color.DARK_GRAY, 0.2, 0.8, 0.1, 32.0, 1.0, 0.0, 0.0);
 
-        Material silverMetallicMaterial = new Material(
-                new Color(192, 192, 192),
-                0.03,
-                0.10,
-                1.0,
-                200.0,
-                1.0,
-                0.3,
-                0.0
-        );
+            // ---- Cameras ----
+            Camera cameraLowRes = new Camera(new Vector3D(0, 1.5, 0), 60.0, calculateFOVv(60.0, 475, 250), 475, 250, 1.0, 100.0);
 
-        Material floorMaterial = new Material(
-                new Color(240, 240, 240),
-                0.2,
-                0.8,
-                0.1,
-                32.0,
-                1.0,
-                0.0,
-                0.0
-        );
+            // ---- Lights ----
+            PointLight pointLightBlue = new PointLight(new Vector3D(-5, 5, 8.5), Color.BLUE, 1);
+            PointLight pointLightGreen = new PointLight(new Vector3D(5, 5, 8.5), Color.GREEN, 1);
+            PointLight pointLightRed = new PointLight(new Vector3D(0, 4, 8), Color.RED, 1);
 
-        Material floorMaterialGray = new Material(
-                Color.DARK_GRAY,
-                0.2,
-                0.8,
-                0.1,
-                32.0,
-                1.0,
-                0.0,
-                0.0
-        );
+            // ---- Objects ----
+            Plane plane = new Plane(new Vector3D(0, -1, 0), new Vector3D(0, 1, 0), floorMaterial);
+            Plane plane_2 = new Plane(new Vector3D(0, 0, 30), new Vector3D(0, 0, -1), floorMaterialGray);
+            Model3D klein = OBJReader.getModel3D("Klein.obj", new Vector3D(0, -0.75, 15), new Vector3D(2, 2, 2), new Vector3D(0, 0, 0), glassMaterial);
+            Model3D cube_1 = OBJReader.getModel3D("cube.obj", new Vector3D(-2.35, 0, 12), new Vector3D(1, 1, 1), new Vector3D(-45, -45, 0), glassMaterial);
+            Model3D cube_2 = OBJReader.getModel3D("cube.obj", new Vector3D(1.9, 0, 12), new Vector3D(1, 1, 1), new Vector3D(45, 45, 0), glassMaterial);
+            Model3D ring_1 = OBJReader.getModel3D("ring.obj", new Vector3D(-0.2, 1.1, 10), new Vector3D(0.5, 0.5, 0.5), new Vector3D(45, 45, 0), silverMetallicMaterial);
+            Model3D ring_2 = OBJReader.getModel3D("ring.obj", new Vector3D(0.2, 0.9, 10), new Vector3D(0.5, 0.5, 0.5), new Vector3D(45, 135, 0), silverMetallicMaterial);
+            Model3D ring_3 = OBJReader.getModel3D("ring.obj", new Vector3D(0, 1.5, 1.3), new Vector3D(0.5, 0.5, 0.5), new Vector3D(90, 0, 0), silverMetallicMaterial);
 
-        // ---- Scene 1 ----
-        Scene scene_1 = new Scene();
+            setCamera(cameraLowRes);
+            addLight(pointLightBlue);
+            addLight(pointLightGreen);
+            addLight(pointLightRed);
+            addObject(plane);
+            addObject(plane_2);
+            addObject(klein);
+            addObject(ring_1);
+            addObject(ring_2);
+            addObject(ring_3);
+            addObject(cube_1);
+            addObject(cube_2);
+        }};*/
 
-        // Camera
-        Camera camera4k = new Camera(
-                new Vector3D(0, 1.5, 0),
-                60.0,
-                calculateFOVv(60.0, 1900, 1000),
-                4096,
-                2160,
-                1.0,
-                100.0
-        );
+        Scene scene_02 = new Scene() {{
+            // ---- Materials ----
+            Material marbleMaterial = new Material(
+                    new Color(235, 235, 240),
+                    0.2,
+                    0.8,
+                    0.6,
+                    60.0,
+                    1.5,
+                    0.2,
+                    0.0
+            );
 
-        Camera cameraHD = new Camera(
-                new Vector3D(0, 1.5, 0),
-                60.0,
-                calculateFOVv(60.0, 1900, 1000),
-                1900,
-                1000,
-                1.0,
-                100.0
-        );
+            Material plasticGrayMaterial = new Material(
+                    Color.DARK_GRAY,
+                    0.2,
+                    0.7,
+                    0.4,
+                    30.0,
+                    1.45,
+                    0.05,
+                    0.0
+            );
 
-        Camera cameraLowRes = new Camera(
-                new Vector3D(0, 1.5, 0),
-                60.0,
-                calculateFOVv(60.0, 475, 250),
-                475,
-                250,
-                1.0,
-                100.0
-        );
+            Material glassMaterialPurple = new Material(new Color(148, 100, 255), 0.17, 0.12, 0.95, 200.0, 1.52, 0.28, 0.3);
+            Material glassMaterial = new Material(new Color(180, 216, 245), 0.17, 0.12, 0.95, 200.0, 1.52, 0.25, 0.4);
 
-        Camera cameraUltralowRes = new Camera(
-                new Vector3D(0, 1.5, 0),
-                60.0,
-                calculateFOVv(60.0, 475, 250),
-                190,
-                100,
-                1.0,
-                100.0
-        );
+            Material silverMetallicMaterial = new Material(new Color(192, 192, 192), 0.03, 0.10, 1.0, 200.0, 1.0, 0.3, 0.0);
+            Material floorMaterial = new Material(new Color(240, 240, 240), 0.2, 0.8, 0.1, 32.0, 1.0, 0.0, 0.0);
 
-        // Lights
-        DirectionalLight mainLight = new DirectionalLight(
-                new Vector3D(0, 0, 1),
-                Color.WHITE,
-                1
-        );
+            // ---- Lights ----
+            AreaLight areaLight = new AreaLight(
+                    new Vector3D(20, 25, 50),
+                    new Vector3D(40, 0, 0),
+                    new Vector3D(0, 40, 0),
+                    new Color(200, 150, 0),
+                    5,
+                    16
+            );
 
-        PointLight pointLight = new PointLight(
-                new Vector3D(0, 5, 28),
-//                new Color(0, 216, 245),
-                Color.WHITE,
-                1
-        );
+            AreaLight areaLight_2 = new AreaLight(
+                    new Vector3D(0, 5, 0),
+                    new Vector3D(-1, 0, 0),
+                    new Vector3D(0, -1, 0),
+                    Color.WHITE,
+                    0.5,
+                    16
+            );
 
-        PointLight pointLightBlue = new PointLight(
-                new Vector3D(-5, 5, 8.5),
-//                new Color(0, 216, 245),
-                Color.BLUE,
-                1
-        );
+            // ---- Objects ----
+            Plane plane = new Plane(new Vector3D(0, -1, 0), new Vector3D(0, 1, 0), floorMaterial);
+            Plane plane_2 = new Plane(new Vector3D(0, 0, 80), new Vector3D(0, 0, -1), glassMaterialPurple);
+            Model3D pc = OBJReader.getModel3D("PC.obj", new Vector3D(0, 4.71, 3), new Vector3D(0.5, 0.5, 0.5), new Vector3D(0, 90, 0), plasticGrayMaterial);
+            Model3D helios = OBJReader.getModel3D("Helios.obj", new Vector3D(0, 4.94, 2), new Vector3D(0.02, 0.02, 0.02), new Vector3D(0, 180, 0), marbleMaterial);
+            Model3D mountains = OBJReader.getModel3D("Mountains.obj", new Vector3D(-15, -4, 50), new Vector3D(0.01, 0.01, 0.01), new Vector3D(90, 0, 0), silverMetallicMaterial);
+            Model3D pedestal = OBJReader.getModel3D("Pedestal.obj", new Vector3D(0, 3.5, 3), new Vector3D(0.3, 0.3, 0.3), new Vector3D(0, 25, 0), glassMaterial);
 
-        PointLight pointLightGreen = new PointLight(
-                new Vector3D(5, 5, 8.5),
-//                new Color(0, 216, 245),
-                Color.GREEN,
-                1
-        );
 
-        PointLight pointLightRed = new PointLight(
-                new Vector3D(0, 4, 8),
-//                new Color(0, 216, 245),
-                Color.RED,
-                1
-        );
-
-        AreaLight areaLight = new AreaLight(
-                new Vector3D(0, 0, 25),
-                new Vector3D(40, 0, 0),
-                new Vector3D(0, 0, 20),
-                Color.WHITE,
-                1.0,
-                16
-        );
-
-        // 3D Objects
-        Plane plane = new Plane(
-                new Vector3D(0, -1, 0),
-                new Vector3D(0, 1, 0),
-                floorMaterial
-        );
-
-        Plane plane_2 = new Plane(
-                new Vector3D(0, 0, 30),
-                new Vector3D(0, 0, -1),
-                floorMaterialGray
-        );
-
-        Model3D klein = OBJReader.getModel3D(
-                "Klein.obj",
-                new Vector3D(0, -0.75, 15),
-                new Vector3D(2, 2, 2),
-                new Vector3D(0, 0, 0),
-                glassMaterial
-        );
-
-        Model3D cube_1 = OBJReader.getModel3D(
-                "cube.obj",
-                new Vector3D(-2.35, 0, 12),
-                new Vector3D(1, 1, 1),
-                new Vector3D(-45, -45, 0),
-                glassMaterial
-        );
-
-        Model3D cube_2 = OBJReader.getModel3D(
-                "cube.obj",
-                new Vector3D(1.9, 0, 12),
-                new Vector3D(1, 1, 1),
-                new Vector3D(45, 45, 0),
-                glassMaterial
-        );
-
-        Model3D ring_1 = OBJReader.getModel3D(
-                "ring.obj",
-                new Vector3D(-0.2, 1.1, 10),
-                new Vector3D(0.5, 0.5, 0.5),
-                new Vector3D(45, 45, 0),
-                silverMetallicMaterial
-        );
-
-        Model3D ring_2 = OBJReader.getModel3D(
-                "ring.obj",
-                new Vector3D(0.2, 0.9, 10),
-                new Vector3D(0.5, 0.5, 0.5),
-                new Vector3D(45, 135, 0),
-                silverMetallicMaterial
-        );
-
-        Model3D ring_3 = OBJReader.getModel3D(
-                "ring.obj",
-                new Vector3D(0, 1.5, 1.3),
-                new Vector3D(0.5, 0.5, 0.5),
-                new Vector3D(90, 0, 0),
-                silverMetallicMaterial
-        );
-
-        // ---- Scene setup ----
-        // Scene 1
-        scene_1.setCamera(cameraLowRes);
-
-//        scene_1.addLight(mainLight);
-//        scene_1.addLight(pointLight);
-        scene_1.addLight(pointLightBlue);
-        scene_1.addLight(pointLightGreen);
-        scene_1.addLight(pointLightRed);
-
-        scene_1.addObject(plane);
-        scene_1.addObject(plane_2);
-
-        scene_1.addObject(klein);
-        scene_1.addObject(ring_1);
-        scene_1.addObject(ring_2);
-        scene_1.addObject(ring_3);
-        scene_1.addObject(cube_1);
-        scene_1.addObject(cube_2);
+            setCamera(camera4k);
+            addLight(areaLight);
+            addLight(areaLight_2);
+            addObject(plane);
+            addObject(plane_2);
+            addObject(pc);
+            addObject(helios);
+            addObject(pedestal);
+            addObject(mountains);
+        }};
 
         // ---- Render ---
-        BufferedImage image = raytrace(scene_1);
-        File outputImage = new File("Render_1_2-Bounces_5-DoF.png");
+//        BufferedImage image = raytrace(scene_01);
+        BufferedImage image = raytrace(scene_02);
+
+//        File outputImage = new File("Render_1_2-Bounces_0-DoF.png");
+        File outputImage = new File("Render_2.png");
+
         try {
             ImageIO.write(image, "png", outputImage);
         } catch (IOException e) {
@@ -270,9 +164,9 @@ public class Raytracer {
         // Depth of field parameters
         final int DOF_SAMPLES = 1;
 //        final double APERTURE_SIZE = 0.09;
-        final double APERTURE_SIZE = 0.00;
+        final double APERTURE_SIZE = 0.005;
 
-        final double FOCUS_DISTANCE = 10.0;
+        final double FOCUS_DISTANCE = 2.0;
         final int height = posRaytrace.length;
         final int width = posRaytrace[0].length;
 
@@ -349,7 +243,7 @@ public class Raytracer {
 
 
     private static Color traceRay(Ray ray, List<Object3D> objects, List<Light> lights, double[] clippingPlanes, int depth, Object3D caster) {
-        final int MAX_REFLECTIONS = 6;
+        final int MAX_REFLECTIONS = 2;
         if (depth > MAX_REFLECTIONS) return Color.BLACK;
         Intersection closestIntersection = raycast(ray, objects, caster, clippingPlanes);
         if (closestIntersection == null) return Color.BLACK;
