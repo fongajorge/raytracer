@@ -13,7 +13,7 @@ import java.util.List;
  * A scene contains a camera, a list of objects that can be rendered (objects in the world),
  * and a list of lights that illuminate the scene.
  *
- * @author Your Name
+ * @author Jorge Fong
  */
 public class Scene {
 

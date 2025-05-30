@@ -69,9 +69,9 @@ public class Raytracer {
         Camera camera = new Camera(
                 new Vector3D(0, 0, 0),
                 60.0,
-                calculateFOVv(60.0, 950, 500),
-                475,
-                250,
+                calculateFOVv(60.0, 1900, 1000),
+                190,
+                100,
                 1.0,
                 100.0
         );
@@ -100,42 +100,69 @@ public class Raytracer {
 
         // 3D Objects
         Model3D teapot = OBJReader.getModel3D(
-                "SmallTeapot.obj",
-                new Vector3D(0, 0, 3),
-                redPlasticMaterial
+                "Klein.obj",
+                new Vector3D(0, -0.8, 8),
+                glassMaterial
         );
 
         Sphere sphere = new Sphere(
                 new Vector3D(0, 0.1, 15),
-                1, redPlasticMaterial
+                1,
+                silverMetallicMaterial
         );
 
         Sphere sphere2 = new Sphere(
-                new Vector3D(3, 0.1, 15),
-                1, silverMetallicMaterial
+                new Vector3D(2, 0.1, 4),
+                1,
+                redPlasticMaterial
+        );
+
+//        Sphere sphere3 = new Sphere(
+//                new Vector3D(-4, 0.1, 20),
+//                1,
+//                glassMaterial
+//        );
+
+        Model3D cube = OBJReader.getModel3D(
+                "cube.obj",
+                new Vector3D(-4, -0.5, 10),
+                glassMaterial
         );
 
         Plane plane = new Plane(
-                new Vector3D(0, -1, 0), // Any point on plane
-                new Vector3D(0, 1, 0),  // Upward normal
+                new Vector3D(0, -1, 0),
+                new Vector3D(0, 1, 0),
                 floorMaterial
         );
 
-        // Scene setup
+        // ---- Scene setup ----
+        // Scene 1
         scene_1.setCamera(camera);
 
-        //scene_1.addLight(mainLight);
-        //scene_1.addLight(pointLight);
+        scene_1.addLight(mainLight);
+        scene_1.addLight(pointLight);
 
-        //scene_1.addObject(plane);
+        scene_1.addObject(plane);
 
-        //scene_1.addObject(teapot);
-        scene_1.addObject(sphere);
-        //scene_1.addObject(sphere2);
+        scene_1.addObject(teapot);
+//        scene_1.addObject(sphere);
+//        scene_1.addObject(sphere2);
+//        scene_1.addObject(cube);
 
         // ---- Render ---
+
+        // Scene 1 (Test)
+//        BufferedImage image = raytrace(scene_1);
+//        File outputImage = new File("Render1.png");
+//        try {
+//            ImageIO.write(image, "png", outputImage);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        System.out.println(new Date());
+
         BufferedImage image = raytrace(scene_1);
-        File outputImage = new File("image.png");
+        File outputImage = new File("Render1.png");
         try {
             ImageIO.write(image, "png", outputImage);
         } catch (IOException e) {
@@ -153,24 +180,66 @@ public class Raytracer {
         Vector3D[][] posRaytrace = mainCamera.calculatePositionsToRay();
         Vector3D pos = mainCamera.getPosition();
         double cameraZ = pos.getZ();
+        // Depth of field parameters
+        final int DOF_SAMPLES = 16;
+        final double APERTURE_SIZE = 0.09;
+        final double FOCUS_DISTANCE = 15.0;
 
-        for (int i = 0; i < posRaytrace.length; i++) {
-            for (int j = 0; j < posRaytrace[i].length; j++) {
-                double x = posRaytrace[i][j].getX() + pos.getX();
-                double y = posRaytrace[i][j].getY() + pos.getY();
-                double z = posRaytrace[i][j].getZ() + pos.getZ();
+        int height = posRaytrace.length;
+        int width = posRaytrace[0].length;
+        int lastPercent = -1;
 
-                Ray ray = new Ray(mainCamera.getPosition(), new Vector3D(x, y, z));
-                Color pixelColor = traceRay(ray, objects, lights, new double[]{cameraZ + nearFarPlanes[0], cameraZ + nearFarPlanes[1]}, 0, null);
-                image.setRGB(i, j, pixelColor.getRGB());
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                Color col = new Color(0, 0, 0);
+                double[] rgb = new double[3];
+                for (int s = 0; s < DOF_SAMPLES; s++) {
+                    // Point on the image plane for pixel (i, j)
+                    Vector3D pixelOnImagePlane = posRaytrace[i][j];
+                    // Camera position is lens center
+                    Vector3D camPos = mainCamera.getPosition();
+                    // Compute the direction from camera to the tile pixel's projection
+                    Vector3D dir = Vector3D.substract(pixelOnImagePlane, camPos); // Not normalized here
+                    // Calculate intersection with focus plane at FOCUS_DISTANCE along view Z
+                    double t_focal = (FOCUS_DISTANCE - camPos.getZ()) / dir.getZ();
+                    Vector3D focusPoint = Vector3D.add(camPos, Vector3D.scalarMultiplication(dir, t_focal));
+                    // Sample a random point on lens (disk in x,y around camPos)
+                    double[] lensSample = sampleDisk(APERTURE_SIZE * 0.5); // radius, not diameter!
+                    Vector3D lensPos = new Vector3D(
+                            camPos.getX() + lensSample[0],
+                            camPos.getY() + lensSample[1],
+                            camPos.getZ()
+                    );
+                    // New direction: from lens sample to focus point
+                    Vector3D dofDir = Vector3D.substract(focusPoint, lensPos);
+                    dofDir = Vector3D.normalize(dofDir);
+                    Ray ray = new Ray(lensPos, dofDir);
+                    Color pixelColor = traceRay(ray, objects, lights,
+                            new double[]{cameraZ + nearFarPlanes[0], cameraZ + nearFarPlanes[1]}, 0, null);
+                    rgb[0] += pixelColor.getRed();
+                    rgb[1] += pixelColor.getGreen();
+                    rgb[2] += pixelColor.getBlue();
+                }
+                // Average samples and clamp
+                int R = (int) Math.clamp(Math.round(rgb[0] / DOF_SAMPLES), 0, 255);
+                int G = (int) Math.clamp(Math.round(rgb[1] / DOF_SAMPLES), 0, 255);
+                int B = (int) Math.clamp(Math.round(rgb[2] / DOF_SAMPLES), 0, 255);
+                col = new Color(R, G, B);
+                image.setRGB(i, j, col.getRGB());
+            }
+
+            // Progress: print if percent increases
+            int percent = (int) ((i + 1) * 100.0 / height);
+            if (percent != lastPercent) {
+                System.out.println("Render progress: " + percent + "%");
+                lastPercent = percent;
             }
         }
-
         return image;
     }
 
     private static Color traceRay(Ray ray, List<Object3D> objects, List<Light> lights, double[] clippingPlanes, int depth, Object3D caster) {
-        final int MAX_REFLECTIONS = 5;
+        final int MAX_REFLECTIONS = 2;
         if (depth > MAX_REFLECTIONS) return Color.BLACK;
         Intersection closestIntersection = raycast(ray, objects, caster, clippingPlanes);
         if (closestIntersection == null) return Color.BLACK;
@@ -358,5 +427,11 @@ public class Raytracer {
     public static double calculateFOVv(double fovH, int w, int h) {
         double ar = (double) w / h;
         return 2.0 * Math.toDegrees(Math.atan(Math.tan(Math.toRadians(fovH / 2.0)) / ar));
+    }
+
+    private static double[] sampleDisk(double radius) {
+        double r = radius * Math.sqrt(Math.random());
+        double theta = 2 * Math.PI * Math.random();
+        return new double[] { r * Math.cos(theta), r * Math.sin(theta) };
     }
 }
