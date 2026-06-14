@@ -22,15 +22,18 @@ A custom, multi-threaded CPU 3D Raytracer built from scratch in Java. This engin
 ## 🖼️ Example Renders
 
 ![Render 1 - Depth of Field](renders/Render_1.png)
-*Example of light refraction through a glass Klein bottle and complex multi-colored light interactions, featuring heavy Depth of Field (DoF) blurring around the camera lens edges.*
+
+* *Example of light refraction through a glass Klein bottle and complex multi-colored light interactions, featuring heavy Depth of Field (DoF) blurring around the camera lens edges.*
 
 ![Render 2 - Depth of Field](renders/Render_2.png)
-*Example of complex .obj mesh rendering, showcasing a metallic bust on a pedestal framed against low-poly mountains and a prominent background light source.*
+
+* *Example of complex .obj mesh rendering, showcasing a metallic bust on a pedestal framed against low-poly mountains and a prominent background light source.*
 
 ![Render 3 - Abstract Shapes and Point Lights](renders/Render_3.png)
-*Example of multiple colored point lights (magenta and green) generating distinct specular highlights on a highly reflective, ribbed abstract model.*
 
-## ⚙️ Project Architecture
+* *Example of multiple colored point lights (magenta and green) generating distinct specular highlights on a highly reflective, ribbed abstract model.*
+
+## 🌳 Project Structure
 
 ```text
 ├── src/edu/up/isgc/cg/raytracer/
@@ -60,8 +63,7 @@ A custom, multi-threaded CPU 3D Raytracer built from scratch in Java. This engin
 │       └── OBJReader.java      # Parses external 3D model files
 │
 ├── renders/                    # Additional directory for output images
-├── *.png                       # Generated high-resolution renders (Render_1, 2, 3)
-├── *.obj                       # Sample 3D meshes (Helios, Klein, Mountains, PC, etc.)
+├── obj/                        # Sample 3D meshes (Helios, Klein, Mountains, PC, etc.)
 └── README.md                   # Project documentation
 
 ```
