@@ -21,11 +21,14 @@ A custom, multi-threaded CPU 3D Raytracer built from scratch in Java. This engin
 
 ## 🖼️ Example Renders
 
-![Render 3 - Abstract Shapes and Point Lights](Render_3.png)
-*Example of multi-point light interactions and metallic reflections on an abstract model.*
+![Render 1 - Depth of Field](Render_1.png)
+*Example of light refraction through a glass Klein bottle and complex multi-colored light interactions, featuring heavy Depth of Field (DoF) blurring around the camera lens edges.*
 
-![Render with Depth of Field](renders/Render_1_2-Bounces_5-DoF.png)
-*Example of Depth of Field (DoF) blurring the background while keeping the foreground object in focus.*
+![Render 2 - Depth of Field](Render_1.png)
+*Example of complex .obj mesh rendering, showcasing a metallic bust on a pedestal framed against low-poly mountains and a prominent background light source.*
+
+![Render 3 - Abstract Shapes and Point Lights](Render_3.png)
+*Example of multiple colored point lights (magenta and green) generating distinct specular highlights on a highly reflective, ribbed abstract model.*
 
 ## ⚙️ Project Architecture
 
@@ -36,5 +39,5 @@ A custom, multi-threaded CPU 3D Raytracer built from scratch in Java. This engin
 * **`OBJReader.java`**: Reads `.obj` files, parses vertices and faces, applies affine transformations (scale/rotation), and groups faces into `Triangle` arrays.
 
 ## 👨‍💻 Authors
-**Jorge Fong @fongajorge**
-**Jafet Rodriguez**
+- **Jorge Fong @fongajorge**
+- **Jafet Rodriguez**
